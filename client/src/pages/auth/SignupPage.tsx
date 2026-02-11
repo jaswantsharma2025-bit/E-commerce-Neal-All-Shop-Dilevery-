@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signupCustomer, signupVendor } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
-interface UserType {
-  name: string;
-  email: string;
-  phone: string;
-  role: 'customer' | 'vendor' | 'rider';
-  address: string;
-}
 
-interface SignupPageProps {
-  onSignup: (user: UserType) => void;
-}
+// interface UserType {
+//   name: string;
+//   email: string;
+//   phone: string;
+//   role: 'customer' | 'vendor' | 'rider';
+//   address: string;
+// }
 
-export const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
+export const SignupPage: React.FC = () => {
+
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -23,24 +23,43 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onSignup }) => {
   const [selectedRole, setSelectedRole] =
     useState<'customer' | 'vendor' | 'rider'>('customer');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const { login } = useAuth();
 
-    const user = {
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  let res;
+
+  if (selectedRole === "vendor") {
+    res = await signupVendor({
       name,
       email,
       phone,
-      role: selectedRole,
-      address: 'Mumbai, Maharashtra',
-    };
+      password,
+      storeName: name + " Store",
+    });
+  } else {
+    res = await signupCustomer({
+      name,
+      email,
+      phone,
+      password,
+    });
+  }
 
-    onSignup(user);
+  if (!res.user) {
+    alert(res.message || "Signup failed");
+    return;
+  }
 
-    // ✅ ROLE BASED REDIRECT
-    if (user.role === 'vendor') navigate('/vendor');
-    else if (user.role === 'rider') navigate('/rider');
-    else navigate('/');
-  };
+  login(res.user, res.token);
+
+  if (res.user.role === "vendor") navigate("/vendor");
+  else navigate("/");
+};
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">

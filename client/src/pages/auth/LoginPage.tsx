@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginCustomer, loginVendor } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
-interface UserType {
-  name: string;
-  email: string;
-  phone: string;
-  role: 'customer' | 'vendor' | 'rider';
-  address: string;
-}
 
-interface LoginPageProps {
-  onLogin: (user: UserType) => void;
-}
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+// interface UserType {
+//   name: string;
+//   email: string;
+//   phone: string;
+//   role: 'customer' | 'vendor' | 'rider';
+//   address: string;
+// }
+
+export const LoginPage: React.FC = () => {
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -21,24 +22,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [selectedRole, setSelectedRole] =
     useState<'customer' | 'vendor' | 'rider'>('customer');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+ const { login } = useAuth();
 
-    const user = {
-      name: email.split('@')[0],
-      email,
-      phone: '+91 98765 43210',
-      role: selectedRole,
-      address: 'Mumbai, Maharashtra',
-    };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    onLogin(user);
+  let res;
 
-    // ✅ ROLE BASED REDIRECT
-    if (user.role === 'vendor') navigate('/vendor');
-    else if (user.role === 'rider') navigate('/rider');
-    else navigate('/');
-  };
+  if (selectedRole === "vendor") {
+    res = await loginVendor({
+      emailOrPhone: email,
+      password,
+    });
+  } else {
+    res = await loginCustomer({
+      emailOrPhone: email,
+      password,
+    });
+  }
+
+  if (!res.token) {
+    alert(res.message || "User does not exist. Please signup.");
+    return;
+  }
+
+  login(res.user, res.token);
+
+  if (res.user.role === "vendor") navigate("/vendor");
+  else navigate("/");
+};
+
 
   /* ⬇⬇⬇ EVERYTHING BELOW THIS IS YOUR ORIGINAL UI ⬇⬇⬇ */
 
