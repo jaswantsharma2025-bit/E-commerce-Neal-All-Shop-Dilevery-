@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 /* ---------------- JWT Helper ---------------- */
@@ -104,7 +104,7 @@ exports.vendorSignup = async (req, res) => {
     });
 
     if (exists) {
-      return res.status(409).json({ message: "Vendor already exists" });
+      return res.status(409).json({ message: "Email already exists" });
     }
 
     const vendor = await User.create({

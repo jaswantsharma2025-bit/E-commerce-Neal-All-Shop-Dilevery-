@@ -5,10 +5,17 @@ const { protect, authorize } = require("../middlewares/auth.middleware");
 const vendorController = require("../controllers/vendor.controller");
 
 router.get(
-  "/me",
+  "/profile",
   protect,
   authorize("vendor"),
   vendorController.getVendorProfile
+);
+
+router.put(
+  "/profile",
+  protect,
+  authorize("vendor"),
+  vendorController.updateVendorProfile
 );
 
 module.exports = router;

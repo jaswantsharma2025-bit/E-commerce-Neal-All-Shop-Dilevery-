@@ -4,5 +4,11 @@ export interface User {
   email?: string;
   phone?: string;
   role: "customer" | "vendor" | "rider";
+  // Vendor fields
   storeName?: string;
+  storeDescription?: string;
+  storeAddress?: string;
+  storeCategory?: string;
+  storeImage?: string;
+  storeOpen?: boolean;
 }

@@ -1,66 +1,82 @@
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "/api";
 
-export async function loginCustomer(data: {
+async function apiFetch(endpoint: string, options: RequestInit = {}) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Something went wrong");
+  }
+
+  return data;
+}
+
+/* ---------- CUSTOMER ---------- */
+
+export function loginCustomer(data: {
   emailOrPhone: string;
   password: string;
 }) {
-  const res = await fetch(`${API_BASE}/auth/customer/login`, {
+  return apiFetch("/auth/customer/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
-
-  return res.json();
 }
 
-export async function signupCustomer(data: {
+export function signupCustomer(data: {
   name: string;
   email: string;
   phone: string;
   password: string;
 }) {
-  const res = await fetch(`${API_BASE}/auth/customer/signup`, {
+  return apiFetch("/auth/customer/signup", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
-
-  return res.json();
 }
 
-export async function loginVendor(data: {
+/* ---------- VENDOR ---------- */
+
+export function loginVendor(data: {
   emailOrPhone: string;
   password: string;
 }) {
-  const res = await fetch(`${API_BASE}/auth/vendor/login`, {
+  return apiFetch("/auth/vendor/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
-
-  return res.json();
 }
 
-export async function signupVendor(data: {
+export function signupVendor(data: {
   name: string;
   email: string;
   phone: string;
   password: string;
   storeName: string;
 }) {
-  const res = await fetch(`${API_BASE}/auth/vendor/signup`, {
+  return apiFetch("/auth/vendor/signup", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
+}
 
-  return res.json();
+export function getVendorProfile() {
+  return apiFetch("/vendor/profile");
+}
+
+export function updateVendorProfile(data: any) {
+  return apiFetch("/vendor/profile", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
 }

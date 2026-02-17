@@ -68,22 +68,26 @@ export default function AppRouter() {
     <Routes>
       {/* PUBLIC ROUTES */}
 
-      <Route
-        path="/"
-        element={
-          <HomePage
-            user={user}
-            cartCount={cartItems.length}
-            cartItems={cartItems}
-            onCategoryClick={(cat) => {
-              setSelectedCategory(cat);
-              navigate("/shops");
-            }}
-            onRemoveFromCart={handleRemoveFromCart}
-            onUpdateQuantity={handleUpdateQuantity}
-          />
-        }
+     <Route
+  path="/"
+  element={
+    user?.role === "vendor" ? (
+      <Navigate to="/vendor" replace />
+    ) : (
+      <HomePage
+        user={user}
+        cartCount={cartItems.length}
+        cartItems={cartItems}
+        onCategoryClick={(cat) => {
+          setSelectedCategory(cat);
+          navigate("/shops");
+        }}
+        onRemoveFromCart={handleRemoveFromCart}
+        onUpdateQuantity={handleUpdateQuantity}
       />
+    )
+  }
+/>
 
       <Route
         path="/shops"

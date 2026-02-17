@@ -37,6 +37,9 @@ const userSchema = new mongoose.Schema(
     // Vendor-specific (only used if role === vendor)
     storeName: String,
     storeImage: String,
+    storeDescription: String,
+storeAddress: String,
+storeCategory: String,
     storeOpen: {
       type: Boolean,
       default: true,
@@ -63,4 +66,4 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.models.User || mongoose.model("User", userSchema);
